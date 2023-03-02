@@ -1,4 +1,8 @@
 # key_store
 **/key_store.json
 
+# .SD_Store
+.DS_Store
 
+# venv_binance/
+venv_binance/
