@@ -22,7 +22,7 @@ def wallet_repartition(wallet):
     plt.show()
 
 def main():
-    wallet = get_wallet()
+    wallet = get_wallet_capitalization_by_crypto()
     wallet_repartition(wallet)
 
 
