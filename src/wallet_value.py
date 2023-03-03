@@ -5,7 +5,7 @@ from get_wallet import *
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 
-DATE = "01 OCTOBER 2022"
+DATE = "01 OCTOBER 2021"
 
 def liste_dates_jusqu_a_aujourd_hui(DATE):
     date = datetime.strptime(DATE, '%d %B %Y')
@@ -24,21 +24,43 @@ def wallet_repartition():
     my_wallet_values = []
     all_cryptos_values = get_wallet_value(DATE)
 
+    dates = liste_dates_jusqu_a_aujourd_hui(DATE)
+    dates = [datetime.strptime(date, '%d/%m/%Y') for date in dates]
+
+    nbr_dates = len(dates)
+    print(nbr_dates)
+
     nbr_cryptos = len(all_cryptos_values)
     if (nbr_cryptos > 0):
+        
         nbr_days = len(all_cryptos_values[0])
     else:
         print("The wallet does not contain any cryptos")
         return -1
 
+
+    new_all_crypto_values = []
+    print(len(all_cryptos_values))
+    for k in range(nbr_cryptos):
+        if (len(all_cryptos_values[k]) != nbr_dates):
+            print(f"Crypto {k} is not considered in our wallet value because we don\'t have enough past data")
+        else:
+            new_all_crypto_values.append(all_cryptos_values[k])
+
+    nbr_cryptos = len(new_all_crypto_values)
+    print(len(new_all_crypto_values))
+
     for k in range(nbr_days):
         day_value = 0
         for i in range(nbr_cryptos):
-            day_value = day_value + all_cryptos_values[i][k]
+
+            # print(f"NBR DAYS FOR the crypto {i} : {len(all_cryptos_values[i])}")
+            # print(k)
+            # print(i)
+            day_value = day_value + new_all_crypto_values[i][k]
         my_wallet_values.append(day_value)
 
-    dates = liste_dates_jusqu_a_aujourd_hui(DATE)
-    dates = [datetime.strptime(date, '%d/%m/%Y') for date in dates]
+    
 
     fig, ax = plt.subplots()
     ax.plot(dates, my_wallet_values)
