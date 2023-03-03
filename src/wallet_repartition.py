@@ -2,13 +2,12 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from get_wallet import *
+from datetime import datetime, timedelta
 
 
 def wallet_repartition(wallet):
     crypto_names = list(wallet.keys())
     crypto_values = list(wallet.values())
-    print(crypto_names)
-    print(crypto_values)
 
     # Pie chart building
     fig, ax = plt.subplots()
@@ -19,7 +18,10 @@ def wallet_repartition(wallet):
     plt.legend(wedges, labels, loc='center left', bbox_to_anchor=(1, 0, 0.5, 1))
     
     plt.title('My Crypto Wallet repartition')
-    plt.show()
+    # plt.show()
+
+    aujourd_hui = datetime.now().strftime('%Y-%m-%d')
+    plt.savefig('../data/wallet_repartition/'+aujourd_hui+'.png')
 
 def main():
     wallet = get_wallet_capitalization_by_crypto()
