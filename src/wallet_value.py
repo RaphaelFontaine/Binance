@@ -53,7 +53,8 @@ def wallet_repartition():
     # Afficher le graphique
     plt.xticks(rotation=45)
     plt.title("Evolution of my wallet value depending on time")
-    plt.show()
+    aujourd_hui = datetime.now().strftime('%Y-%m-%d')
+    plt.savefig('../data/wallet_value/'+aujourd_hui+'.png')
 
 
 def main():
