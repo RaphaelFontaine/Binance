@@ -11,7 +11,7 @@ keys = get_keys()
 api_key = keys[0]
 api_secret = keys[1]
 
-DATE = "2022-01-01"
+DATE = "2021-09-01"
 
 # public static BinanceClient GetClient() { return new BinanceClient(new BinanceClientOptions { ApiCredentials = new CryptoExchange.Net.Authentication.ApiCredentials(key, secret), AutoTimestamp = true }); }
 
@@ -43,18 +43,18 @@ def get_ms_since_date(date_str):
     ms_since_now = int(dt.datetime.now().timestamp() * 1000) - ms_since_epoch
     return ms_since_now
 
-def get_deposit_history():
+def get_deposit_history(transaction_type):
 
-    # ms = get_ms_since_date(DATE)
-    # print(ms)
     ms = date_to_ms(DATE)
-    print(ms)
-
 
     url = "https://api.binance.com/sapi/v1/fiat/orders"
 
     timestamp = int(dt.datetime.now().timestamp() * 1000)
-    params = {'transactionType' : '0', 'timestamp': timestamp, 'beginTime' : ms} 
+    print(transaction_type)
+    if (transaction_type == 0):
+        params = {'transactionType' : "0", 'timestamp': timestamp, 'beginTime' : ms} 
+    else:
+        params = {'transactionType' : "1", 'timestamp': timestamp, 'beginTime' : ms} 
     headers = {'X-MBX-APIKEY': api_key}
 
     # Calcul de la signature de la requête
@@ -77,24 +77,25 @@ def get_deposit_history():
     total_deposit = 0
     for deposit in deposits:
         status = deposit['status']
-        print(status)
         if (status == 'Successful'):
             amount = deposit['indicatedAmount']
-            print(amount)
             total_deposit = total_deposit + float(amount)
-    print(total_deposit)
-        # deposit_time = dt.datetime.fromtimestamp(int(deposit['insertTime']) / 1000)
-        # if deposit_time < dt.datetime.strptime(DATE, '%Y-%m-%d'):
-        #     continue
-        # deposit_amount = float(deposit['amount'])
-        # deposit_asset = deposit['asset']
-        # print(f"{deposit_time}: {deposit_amount} {deposit_asset}")
-    
+    if (transaction_type == 0):
+        print(f"TOTAL DEPOSIT : {total_deposit}")
+    else:
+        print(f"TOTAL WITHDRAWS : {total_deposit}")
+    return total_deposit
 
 def main():
-    check_system_time()
-    get_deposit_history()
-
+    print(len(sys.argv))
+    if (len(sys.argv) == 1):
+        print("Enter an arg : \n - 0 : deposits \n - 1 withdrawals")
+        return 0
+    else:
+        transaction_type = sys.argv[1]
+        print(type(transaction_type))
+        check_system_time()
+        get_deposit_history(transaction_type)
 
 if __name__ == '__main__':
     sys.exit(main())
