@@ -53,5 +53,5 @@ elif [ "$#" -eq 1 ];
         fi
 
 else
-    echo "Enter zero or one argument. If you enter one arg, enter of the following argument depending on what diagraph you want \n - r : repartition of yor wallet \n - v : value of your wallet "
+    echo -e "Enter zero or one argument. If you enter one arg, enter of the following argument depending on what diagraph you want \n - r : repartition of yor wallet \n - v : value of your wallet "
 fi
