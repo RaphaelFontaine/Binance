@@ -28,7 +28,6 @@ def wallet_repartition():
     dates = [datetime.strptime(date, '%d/%m/%Y') for date in dates]
 
     nbr_dates = len(dates)
-    print(nbr_dates)
 
     nbr_cryptos = len(all_cryptos_values)
     if (nbr_cryptos > 0):
@@ -40,7 +39,6 @@ def wallet_repartition():
 
 
     new_all_crypto_values = []
-    print(len(all_cryptos_values))
     for k in range(nbr_cryptos):
         if (len(all_cryptos_values[k]) != nbr_dates):
             print(f"Crypto {k} is not considered in our wallet value because we don\'t have enough past data")
@@ -48,15 +46,10 @@ def wallet_repartition():
             new_all_crypto_values.append(all_cryptos_values[k])
 
     nbr_cryptos = len(new_all_crypto_values)
-    print(len(new_all_crypto_values))
 
     for k in range(nbr_days):
         day_value = 0
         for i in range(nbr_cryptos):
-
-            # print(f"NBR DAYS FOR the crypto {i} : {len(all_cryptos_values[i])}")
-            # print(k)
-            # print(i)
             day_value = day_value + new_all_crypto_values[i][k]
         my_wallet_values.append(day_value)
 
