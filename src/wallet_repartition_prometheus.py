@@ -15,17 +15,30 @@ def actual_portfolio_value():
     return 0
 
 def wallet_deposit_data():
-    total_deposit = get_deposit_history("0")
+    total_deposit = get_deposit_history("0")[0]
     deposit = Gauge('Deposit', 'Total deposit')
     deposit.set(total_deposit)
     return 0
 
-def wallet_withdrawal_data():
-    total_withdraw = get_deposit_history("1")
-    woithdraw = Gauge('Withdrawal', 'Total withdrawal')
-    woithdraw.set(total_withdraw)
+def wallet_historical_deposit_data():
+    deposits = get_deposit_history("0")[1]
+    aux = "depot"
+    for k in range(len(deposits[0])):
+        name = aux + str(k+1)
+        print(name)
+        value_deposit = deposits[1][k]
+        value_name =  name + str(k+1)
+        value_legend = 'Depot numero ' + str(k+1)
+        name = Gauge(deposits[0][k], value_legend)
+        name.set(value_deposit)
+        aux = "depot"
     return 0
 
+def wallet_withdrawal_data():
+    total_withdraw = get_deposit_history("1")[0]
+    withdraw = Gauge('Withdrawal', 'Total withdrawal')
+    withdraw.set(total_withdraw)
+    return 0
 
 def wallet_value_data():
 
@@ -64,9 +77,26 @@ def wallet_repartition_data():
 
 def main():
 
-    actual_portfolio_value()
-    wallet_deposit_data()
-    wallet_withdrawal_data()
+    try:
+        actual_portfolio_value()
+    except:
+        print("Error when getting actual wallet value")
+
+    try:
+        wallet_historical_deposit_data()
+    except:
+        print("Error when getting historical deposits")
+
+    try:
+        wallet_deposit_data()
+    except:
+        print("Error when getting total deposit")
+
+    try: 
+        wallet_withdrawal_data()
+    except:
+        print("Error when getting total withdrawal")
+
     
     wallet_value_data()
     wallet_repartition_data()
