@@ -75,37 +75,20 @@ def get_deposit_history(transaction_type):
     deposits = response.json()['data']
     
     total_deposit = 0
+    historical_deposits = [[], []]
     for deposit in deposits:
         status = deposit['status']
         if (status == 'Successful'):
             amount = deposit['indicatedAmount']
-            # headers = {'access_key': api_key}
-            # exchange_rate_url = "https://api.exchangeratesapi.io/latest?base=EUR&symbols=USD"
-            # exchange_rate_response = requests.get(exchange_rate_url, headers=headers)
-            # print(exchange_rate_response.json())
-            # exchange_rate = exchange_rate_response.json()['rates']['USD']
+            date = deposit['createTime']
+            historical_deposits[0].append(date)
+            historical_deposits[1].append(float(amount))
             total_deposit = total_deposit + float(amount)
     if (transaction_type == 0):
         print(f"TOTAL DEPOSIT : {total_deposit}")
     else:
         print(f"TOTAL WITHDRAWS : {total_deposit}")
-    return total_deposit
-
-def convert_eur_to_usd(eur_amount):
-    """Converts a given amount in euros to US dollars using the current exchange rate"""
-    
-    # Make a request to the API to get the latest exchange rates
-    access_key =  exchanger_api_key
-    response = requests.get(f'http://data.fixer.io/api/latest?access_key={access_key}&base=EUR&symbols=USD')
-    
-    # Extract the exchange rate from the response JSON
-    exchange_rate = response.json()
-    print(exchange_rate)
-    
-    # Convert the euro amount to US dollars using the exchange rate
-    usd_amount = eur_amount * exchange_rate
-    
-    return usd_amount
+    return [total_deposit, historical_deposits]
 
 def main():
     if (len(sys.argv) == 1):
@@ -114,7 +97,7 @@ def main():
     else:
         transaction_type = sys.argv[1]
         check_system_time()
-        total = get_deposit_history(transaction_type)
+        total, historical_deposits = get_deposit_history(transaction_type)
         # print(convert_eur_to_usd(total))
 
 if __name__ == '__main__':
