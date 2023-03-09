@@ -4,8 +4,18 @@ import numpy as np
 from get_wallet import *
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
+import pandas as pd
+import hashlib
+import hmac
+import requests
+import json
+import time
 
 DATE = "01 OCTOBER 2021"
+keys = get_keys()
+api_key = keys[0]
+api_secret = keys[1]
+
 
 def liste_dates_jusqu_a_aujourd_hui(DATE):
     date = datetime.strptime(DATE, '%d %B %Y')
@@ -19,7 +29,7 @@ def liste_dates_jusqu_a_aujourd_hui(DATE):
 
     return dates
 
-def wallet_repartition():
+def wallet_value():
 
     my_wallet_values = []
     all_cryptos_values = get_wallet_value(DATE)
@@ -53,8 +63,13 @@ def wallet_repartition():
             day_value = day_value + new_all_crypto_values[i][k]
         my_wallet_values.append(day_value)
 
-    
+    return [dates, my_wallet_values]
 
+def graph_wallet_value(L):
+
+    dates = L[0]
+    my_wallet_values = L[1]
+    
     fig, ax = plt.subplots()
     ax.plot(dates, my_wallet_values)
 
@@ -71,9 +86,9 @@ def wallet_repartition():
     aujourd_hui = datetime.now().strftime('%Y-%m-%d')
     plt.savefig('../data/wallet_value/'+aujourd_hui+'.png')
 
-
 def main():
-    wallet_repartition()
+    L = wallet_value()
+    graph_wallet_value(L)
 
 
 if __name__ == '__main__':

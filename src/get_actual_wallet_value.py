@@ -17,6 +17,7 @@ def get_portfolio_value():
             ticker_price = next((item for item in ticker_prices if item["symbol"] == symbol), None)
             if ticker_price:
                 total_value += float(balance['free']) * float(ticker_price['price'])
+    print(f"ACTUAL WALLET VALUE {total_value}")
     return total_value
 
 def main():

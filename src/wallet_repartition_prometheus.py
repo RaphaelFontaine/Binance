@@ -10,8 +10,8 @@ from get_actual_wallet_value import get_portfolio_value
 
 def actual_portfolio_value():
     value = get_portfolio_value()
-    actual_value = Gauge('Actual value', 'Actual value of my wallet')
-    actual_value.send(value)
+    actual_value = Gauge('Actual_value', 'Actual value of my wallet')
+    actual_value.set(value)
     return 0
 
 def wallet_deposit_data():
