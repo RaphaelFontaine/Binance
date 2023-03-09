@@ -10,6 +10,7 @@ import sys
 keys = get_keys()
 api_key = keys[0]
 api_secret = keys[1]
+exchanger_api_key = '4bqH7ZuctKO8qM5y10Mdgw46jVMbesYq'
 
 DATE = "2021-09-01"
 
@@ -78,12 +79,33 @@ def get_deposit_history(transaction_type):
         status = deposit['status']
         if (status == 'Successful'):
             amount = deposit['indicatedAmount']
+            # headers = {'access_key': api_key}
+            # exchange_rate_url = "https://api.exchangeratesapi.io/latest?base=EUR&symbols=USD"
+            # exchange_rate_response = requests.get(exchange_rate_url, headers=headers)
+            # print(exchange_rate_response.json())
+            # exchange_rate = exchange_rate_response.json()['rates']['USD']
             total_deposit = total_deposit + float(amount)
     if (transaction_type == 0):
         print(f"TOTAL DEPOSIT : {total_deposit}")
     else:
         print(f"TOTAL WITHDRAWS : {total_deposit}")
     return total_deposit
+
+def convert_eur_to_usd(eur_amount):
+    """Converts a given amount in euros to US dollars using the current exchange rate"""
+    
+    # Make a request to the API to get the latest exchange rates
+    access_key =  exchanger_api_key
+    response = requests.get(f'http://data.fixer.io/api/latest?access_key={access_key}&base=EUR&symbols=USD')
+    
+    # Extract the exchange rate from the response JSON
+    exchange_rate = response.json()
+    print(exchange_rate)
+    
+    # Convert the euro amount to US dollars using the exchange rate
+    usd_amount = eur_amount * exchange_rate
+    
+    return usd_amount
 
 def main():
     if (len(sys.argv) == 1):
@@ -92,7 +114,8 @@ def main():
     else:
         transaction_type = sys.argv[1]
         check_system_time()
-        get_deposit_history(transaction_type)
+        total = get_deposit_history(transaction_type)
+        # print(convert_eur_to_usd(total))
 
 if __name__ == '__main__':
     sys.exit(main())
