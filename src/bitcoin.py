@@ -8,6 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 data_file = "/Users/raphaelfontaine/Documents/GIT/Binance/data/JSON_DATA/bitcoin_values.json"
+DATE = "2021-10-10"
 
 def bitcoin_value():
     # Définir un histogramme Prometheus pour suivre les valeurs quotidiennes du bitcoin
@@ -21,7 +22,7 @@ def bitcoin_value():
         old_dates = list(bitcoin_data.keys())
         last_date = old_dates[len(old_dates)-1]
     else : 
-        last_date = "2021-10-10"
+        last_date = DATE
         bitcoin_data = {}
 
     while last_date < time.strftime("%Y-%m-%d"):
@@ -46,7 +47,7 @@ def bitcoin_value():
     with open(data_file, 'w') as f:
         json.dump(bitcoin_data, f, indent=4, sort_keys=True)
 
-    return bitcoin_values
+    return 0
 
 def graph_bitcoin():
     with open(data_file, 'r') as f:
@@ -63,13 +64,12 @@ def graph_bitcoin():
     # Tracé du graphe
     ax.plot(dates, values)
 
-    # Configuration des étiquettes d'axe
-
     # Affichage du graphe
     plt.xlabel("Date")
     plt.ylabel("Bitcoin value")
-    plt.title("Variation of bitcoin value siince October 2021")
+    plt.title("Variation of bitcoin value since October 2021")
     plt.xticks(rotation=45, ha='right')
+
     plt.tight_layout()
     # plt.show()
 
