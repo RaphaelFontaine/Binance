@@ -84,6 +84,7 @@ def graph_wallet_value(L):
     plt.xticks(rotation=45)
     plt.title("Evolution of my wallet value depending on time")
     aujourd_hui = datetime.now().strftime('%Y-%m-%d')
+    plt.tight_layout()
     plt.savefig('../data/wallet_value/'+aujourd_hui+'.png')
 
 def main():

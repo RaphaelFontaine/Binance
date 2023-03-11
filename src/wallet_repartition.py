@@ -17,10 +17,10 @@ def wallet_repartition(wallet):
     labels = ['{0} - {1:1.1f}%'.format(crypto_names[i], crypto_values[i]/sum(crypto_values)*100) for i in range(len(crypto_names))]
     plt.legend(wedges, labels, loc='center left', bbox_to_anchor=(1, 0, 0.5, 1))
     
-    plt.title('My Crypto Wallet repartition')
-    # plt.show()
-
     aujourd_hui = datetime.now().strftime('%Y-%m-%d')
+    plt.title('My Crypto Wallet repartition : ' + aujourd_hui)
+    # plt.show()
+    plt.tight_layout()
     plt.savefig('../data/wallet_repartition/'+aujourd_hui+'.png')
 
 def main():
