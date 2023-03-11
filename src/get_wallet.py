@@ -64,6 +64,7 @@ def get_wallet_value(date):
     wallet = {}
     wallet_value = []
     all_cryptos_values = []
+    cryptos_trigram = []
     
     for balance in balances:
         if float(balance['free']) + float(balance['locked']) > 0:
@@ -76,6 +77,7 @@ def get_wallet_value(date):
 
     for p in positions:
         TRIGRAM = p['asset']
+        cryptos_trigram.append(TRIGRAM)
         total = p['total']
         crypto_value_by_day = get_crypto_value_by_day(TRIGRAM, date)
         if (crypto_value_by_day != -1):
@@ -83,7 +85,7 @@ def get_wallet_value(date):
                 crypto_value_by_day[k] = total * float(crypto_value_by_day[k])
             all_cryptos_values.append(crypto_value_by_day)
 
-    return all_cryptos_values
+    return [all_cryptos_values, cryptos_trigram]
         
 
 

@@ -1,52 +1,65 @@
 import sys
 import matplotlib.pyplot as plt
-import numpy as np
 from get_wallet import *
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
-import pandas as pd
-import hashlib
-import hmac
-import requests
-import json
+import os
 import time
 
-DATE = "01 OCTOBER 2021"
+DATE = "2021-10-10"
 keys = get_keys()
 api_key = keys[0]
 api_secret = keys[1]
 
+data_file = "/Users/raphaelfontaine/Documents/GIT/Binance/data/JSON_DATA/wallet_value.json"
 
 def liste_dates_jusqu_a_aujourd_hui(DATE):
-    date = datetime.strptime(DATE, '%d %B %Y')
-
-    aujourd_hui = datetime.now()
+    date = DATE
+    aujourd_hui = time.strftime("%Y-%m-%d")
     dates = []
 
-    while date <= aujourd_hui:
-        dates.append(date.strftime('%d/%m/%Y'))
-        date = date + timedelta(days=1)
+    taille = os.stat(data_file).st_size
+    if (taille != 0):
+        with open(data_file, 'r') as f:
+            wallet_value_data = json.loads(f.read())
+        old_dates = list(wallet_value_data.keys())
+        date = old_dates[len(old_dates)-1]
+    else : 
+        date = DATE
 
+    while date <= aujourd_hui:
+        date = datetime.strptime(date, '%Y-%m-%d')
+        date = date + timedelta(days=1)
+        date = date.strftime('%Y-%m-%d')
+        dates.append(date)
     return dates
 
 def wallet_value():
 
     my_wallet_values = []
-    all_cryptos_values = get_wallet_value(DATE)
-
     dates = liste_dates_jusqu_a_aujourd_hui(DATE)
-    dates = [datetime.strptime(date, '%d/%m/%Y') for date in dates]
+
+    if not dates:
+        print("We already got every data in our json : wallet_value.json")
+        return -1
+
+    L = get_wallet_value(dates[0])
+    all_cryptos_values = L[0]
+    cryptos_trigram = L[1]
+    print(cryptos_trigram)
+    taille = os.stat(data_file).st_size
+    if (taille != 0):
+        with open(data_file, 'r') as f:
+            wallet_value_data = json.loads(f.read())
+    else: wallet_value_data = {}
 
     nbr_dates = len(dates)
-
     nbr_cryptos = len(all_cryptos_values)
     if (nbr_cryptos > 0):
-        
         nbr_days = len(all_cryptos_values[0])
     else:
         print("The wallet does not contain any cryptos")
         return -1
-
 
     new_all_crypto_values = []
     for k in range(nbr_cryptos):
@@ -58,38 +71,52 @@ def wallet_value():
     nbr_cryptos = len(new_all_crypto_values)
 
     for k in range(nbr_days):
-        day_value = 0
+        json_day = {}
         for i in range(nbr_cryptos):
-            day_value = day_value + new_all_crypto_values[i][k]
+            trigram = cryptos_trigram[i]
+            day_crypto_value = new_all_crypto_values[i][k]
+            json_day[trigram] = day_crypto_value
+        date = dates[k]
+        wallet_value_data[date] = json_day
+
+    with open(data_file, 'w') as f:
+        json.dump(wallet_value_data, f, indent=4, sort_keys=True)
+    return 0
+
+def graph_wallet_value():
+    with open(data_file, 'r') as f:
+        wallet_value_data = json.loads(f.read())
+
+    dates = list(wallet_value_data.keys())
+    my_wallet_values = []
+    
+    for k in range(len(dates)):
+        day_value = 0
+        json_day = wallet_value_data[dates[k]]
+        values = list(json_day.values())
+        for i in range(len(values)):
+            day_value = day_value + values[i]
         my_wallet_values.append(day_value)
 
-    return [dates, my_wallet_values]
-
-def graph_wallet_value(L):
-
-    dates = L[0]
-    my_wallet_values = L[1]
-    
     fig, ax = plt.subplots()
+    dates = [datetime.strptime(date_str, "%Y-%m-%d").date() for date_str in dates]
     ax.plot(dates, my_wallet_values)
 
-    date_form = mdates.DateFormatter('%Y-%m')
-    ax.xaxis.set_major_formatter(date_form)
-
-    # Ajouter des labels pour les axes
-    ax.set_xlabel('Time')
-    ax.set_ylabel('My wallet valuation')
-
-    # Afficher le graphique
-    plt.xticks(rotation=45)
-    plt.title("Evolution of my wallet value depending on time")
-    aujourd_hui = datetime.now().strftime('%Y-%m-%d')
+    # Affichage du graphe
+    plt.xlabel("Date")
+    plt.ylabel("Wallet value")
+    plt.title("Variation of my wallet value since October 2021")
+    plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
+    # plt.show()
+
+    aujourd_hui = datetime.now().strftime('%Y-%m-%d')
     plt.savefig('../data/wallet_value/'+aujourd_hui+'.png')
 
 def main():
-    L = wallet_value()
-    graph_wallet_value(L)
+    liste_dates_jusqu_a_aujourd_hui(DATE)
+    wallet_value()
+    graph_wallet_value()
 
 
 if __name__ == '__main__':
