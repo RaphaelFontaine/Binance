@@ -5,7 +5,9 @@ import json
 import time
 import datetime as dt
 from get_wallet import *
+import os
 import sys
+import matplotlib.pyplot as plt
 
 keys = get_keys()
 api_key = keys[0]
@@ -14,7 +16,7 @@ exchanger_api_key = '4bqH7ZuctKO8qM5y10Mdgw46jVMbesYq'
 
 DATE = "2021-09-01"
 
-# public static BinanceClient GetClient() { return new BinanceClient(new BinanceClientOptions { ApiCredentials = new CryptoExchange.Net.Authentication.ApiCredentials(key, secret), AutoTimestamp = true }); }
+data_file = "/Users/raphaelfontaine/Documents/GIT/Binance/data/JSON_DATA/operations.json"
 
 def check_system_time():
     # Récupération de l'heure actuelle du système
@@ -48,6 +50,29 @@ def get_deposit_history(transaction_type):
 
     ms = date_to_ms(DATE)
 
+    taille = os.stat(data_file).st_size
+
+    if (taille != 0):
+        with open(data_file, 'r') as f:
+            operations_data = json.loads(f.read())
+        if (transaction_type == "0"):
+            operations = operations_data["deposits"]
+        else:
+            operations = operations_data["withdrawal"]
+        
+        if not not operations:
+            old_dates = list(operations.keys())
+            ms = date_to_ms(old_dates[len(old_dates)-1])
+        else: 
+            ms = date_to_ms(DATE)
+    else : 
+        ms = date_to_ms(DATE)
+        operations_data = {
+            "deposits" : {},
+            "withdrawal" : {}
+        }
+        
+
     url = "https://api.binance.com/sapi/v1/fiat/orders"
 
     timestamp = int(dt.datetime.now().timestamp() * 1000)
@@ -73,22 +98,61 @@ def get_deposit_history(transaction_type):
 
     # Traitement de la réponse
     deposits = response.json()['data']
-    
-    total_deposit = 0
-    historical_deposits = [[], []]
     for deposit in deposits:
         status = deposit['status']
         if (status == 'Successful'):
-            amount = deposit['indicatedAmount']
+            amount = float(deposit['indicatedAmount'])
             date = deposit['createTime']
-            historical_deposits[0].append(date)
-            historical_deposits[1].append(float(amount))
-            total_deposit = total_deposit + float(amount)
-    if (transaction_type == 0):
-        print(f"TOTAL DEPOSIT : {total_deposit}")
+            date = dt.datetime.fromtimestamp(date/1000)
+            date = date.strftime('%Y-%m-%d')
+            if (transaction_type == "0"):
+                operations_data["deposits"][date] = amount
+            else:
+                operations_data["withdrawal"][date] = amount
+
+    with open(data_file, 'w') as f:
+        json.dump(operations_data, f, indent=4, sort_keys=True)
+    return 0
+
+def graph_operations(transaction_type):
+
+    with open(data_file, 'r') as f:
+        operations_data = json.loads(f.read())
+    
+    if (transaction_type == "0"):
+        operations = operations_data["deposits"]
+        title = "Deposits since creation of the account"
     else:
-        print(f"TOTAL WITHDRAWS : {total_deposit}")
-    return [total_deposit, historical_deposits]
+        operations = operations_data["withdrawal"]
+        title = "Withdrawals since creation of the account"
+    
+    cumulative_sum = 0
+    cumulative_data = {}
+
+    for date, value in operations.items():
+        cumulative_sum += value
+        cumulative_data[date] = cumulative_sum
+
+    x = list(cumulative_data.keys())
+    y = list(cumulative_data.values())
+
+    dates = list(operations.keys())
+    values = list(operations.values())
+
+    plt.bar(x, y)
+    plt.title(title)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    for i, value in enumerate(y):
+        plt.text(i, value, int(value), ha='center', va='bottom')
+    
+    aujourd_hui = dt.datetime.now().strftime('%Y-%m-%d')
+    if (transaction_type == "0"):
+        name_file = "deposits/" + aujourd_hui
+    else:
+        name_file = "withdrawals/" + aujourd_hui
+    plt.savefig('../data/operations/'+name_file+'.png')
+    # plt.show()
 
 def main():
     if (len(sys.argv) == 1):
@@ -97,8 +161,8 @@ def main():
     else:
         transaction_type = sys.argv[1]
         check_system_time()
-        total, historical_deposits = get_deposit_history(transaction_type)
-        # print(convert_eur_to_usd(total))
+        get_deposit_history(transaction_type)
+        graph_operations(transaction_type)
 
 if __name__ == '__main__':
     sys.exit(main())
