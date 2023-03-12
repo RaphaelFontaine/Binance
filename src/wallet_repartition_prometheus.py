@@ -28,32 +28,30 @@ def wallet_operations_data():
     for date, amount in data['deposits'].items():
         gauge_deposits.labels(date=date).set(amount)
 
-    gauge_deposits = Gauge('withdrawal', 'All withdrawal completed', ['date'])
+    gauge_withdrawals= Gauge('withdrawal', 'All withdrawal completed', ['date'])
 
     # Parcourir les données de dépôt et mettre à jour le métrique Gauge
     for date, amount in data['withdrawal'].items():
-        gauge_deposits.labels(date=date).set(amount)
+        gauge_withdrawals.labels(date=date).set(amount)
 
 
 
 def wallet_value_data():
 
-    gauge_metric = Gauge('wallet_value', 'Wallet value depending on the date', ['date'])
-
+    gauge_wallet_value = Gauge('wallet_value', 'Wallet value depending on the date', ['date', 'trigram'])
+    data_file = "/Users/raphaelfontaine/Documents/GIT/Binance/data/JSON_DATA/wallet_value.json"
     with open(data_file, 'r') as f:
         wallet_value_data = json.loads(f.read())
     
-    dates = list(wallet_deposit_data.keys())
-    
+    dates = list(wallet_value_data.keys())
     
     for k in range(len(dates)):
         date  = dates[k]
-        unix_date = int(datetime.datetime.timestamp(date))
-        # print(type(date))
-        value = wallet_values[k]
-        # timestamp = int(date.timestamp())
-        gauge_metric.labels(date=date).set(value)
-
+        cryptos = list(wallet_value_data[date].keys())
+        for i in range(len(cryptos)):
+            trigram = cryptos[i]
+            value = wallet_value_data[date][trigram]
+            gauge_wallet_value.labels(date=date, trigram=trigram).set(value)
     return 0
 
 def wallet_repartition_data():
@@ -78,10 +76,10 @@ def bitcoin_values_data():
     with open(data_file, 'r') as f:
         wallet_value_data = json.loads(f.read())
 
-    metric = Gauge('bitcoin', 'Bitcoin value', ['date'])
+    gauge_bitcoin = Gauge('bitcoin', 'Bitcoin value', ['date'])
 
     for date, value in wallet_value_data.items():
-        metric.labels(date).set(value)
+        gauge_bitcoin.labels(date).set(value)
 
     return 0
 

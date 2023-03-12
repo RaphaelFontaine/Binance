@@ -8,7 +8,9 @@ api_secret = keys[1]
 def get_portfolio_value():
     client = Client(api_key, api_secret)
     ticker_prices = client.get_all_tickers()
-    portfolio = client.get_account()['balances']
+    
+    portfolio = client.get_account()
+    portfolio = portfolio["balances"]
     total_value = 0
 
     for balance in portfolio:
@@ -17,7 +19,6 @@ def get_portfolio_value():
             ticker_price = next((item for item in ticker_prices if item["symbol"] == symbol), None)
             if ticker_price:
                 total_value += float(balance['free']) * float(ticker_price['price'])
-    print(f"ACTUAL WALLET VALUE {total_value}")
     return total_value
 
 def main():
