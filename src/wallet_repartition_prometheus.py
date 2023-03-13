@@ -34,8 +34,6 @@ def wallet_operations_data():
     for date, amount in data['withdrawal'].items():
         gauge_withdrawals.labels(date=date).set(amount)
 
-
-
 def wallet_value_data():
 
     gauge_wallet_value = Gauge('wallet_value', 'Wallet value depending on the date', ['date', 'trigram'])
@@ -81,9 +79,7 @@ def bitcoin_values_data():
     for date, value in wallet_value_data.items():
         gauge_bitcoin.labels(date).set(value)
 
-    return 0
-
-    
+    return 0    
 
 def main():
 
