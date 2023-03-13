@@ -24,4 +24,13 @@ This file must be of the following format :
   "api_key" : <your_key>,
   "secret_key": <your_secret_key>
 }
+
+You also need to build your virtual environment by entering the following command : 
+```
+  python -m venv mon_env
+  source mon_env/bin/activate
+  pip install -r requirements.txt
+
+```
+
 If those rules are not respected, the programs will not run.
