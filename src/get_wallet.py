@@ -61,8 +61,6 @@ def get_wallet_capitalization_by_crypto():
 
 def get_wallet_value(date):
     positions = []
-    wallet = {}
-    wallet_value = []
     all_cryptos_values = []
     cryptos_trigram = []
     
