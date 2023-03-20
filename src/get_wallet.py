@@ -8,8 +8,6 @@ keys = get_keys()
 api_key = keys[0]
 api_secret = keys[1]
 
-# print(f'API Key : ', api_key, '\nSECRET KEY : ', api_secret)
-
 client = Client(api_key, api_secret)
 
 balances = client.get_account()['balances']

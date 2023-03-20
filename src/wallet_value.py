@@ -14,6 +14,7 @@ api_secret = keys[1]
 data_file = "/Users/raphaelfontaine/Documents/GIT/Binance/data/JSON_DATA/wallet_value.json"
 
 def liste_dates_jusqu_a_aujourd_hui(DATE):
+
     date = DATE
     aujourd_hui = time.strftime("%Y-%m-%d")
     dates = []
