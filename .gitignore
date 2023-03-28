@@ -9,3 +9,6 @@ venv_binance/
 
 #logs/
 logs/
+
+#data/
+data/
