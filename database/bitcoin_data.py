@@ -1,7 +1,6 @@
 import psycopg2
 import sys
 import json
-import datetime
 
 def initialize():
     try:
@@ -24,11 +23,7 @@ def get_max_date(conn, cur):
         conn.commit()
         most_recent_date = cur.fetchone()[0]
         print("Getting last date in PostgreSQL database")
-    
-        #fermeture de la connexion à la base de données
-        cur.close()
-        conn.close()
-        print("Connection PostgreSQL closed")
+
         return most_recent_date
 
     except (Exception, psycopg2.Error) as error :
@@ -44,10 +39,6 @@ def delete_date(conn, cur, date):
         cur.execute(sql, (value,))
         conn.commit()
         print("Deletion of a date in the PostgreSQL database")
-
-        cur.close()
-        conn.close()
-        print("Connection PostgreSQL closed")
 
     except (Exception, psycopg2.Error) as error :
         print ("Error when deleting a date in PostgreSQL", error)
@@ -77,10 +68,6 @@ def send_bitcoin_data(conn, cur):
             print("Data added with success in PostgreSQL database")
         else:
             print("All datas have already been added")
-    
-        cur.close()
-        conn.close()
-        print("Connection PostgreSQL closed")
 
     except (Exception, psycopg2.Error) as error :
         print ("Error when adding datas in PostgreSQL database", error)
@@ -88,6 +75,11 @@ def send_bitcoin_data(conn, cur):
 def main():
     conn, cur = initialize()
     send_bitcoin_data(conn, cur)
+
+    #fermeture de la connexion à la base de données
+    cur.close()
+    conn.close()
+    print("Connection to PostgreSQL closed")
 
 if __name__ == '__main__':
     sys.exit(main())
